@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Assignment #12 execution timing script.
+#
+# -----------------------------------------------------
+# Initial checks.
+#	Ensure executable files exists.
+#	Ensure test file exists
+#
+if [ -z $1 ]; then
+	echo "Usage:  ./a12timer <asst12_Executable>"
+	exit
+fi
+#
+if [ ! -e $1 ] || [ ! -x $1 ]; then
+	echo "Error, unable to find assignment #12 $1 executable file."
+	exit
+fi
+#
+# -----------------------------------------------------
+# Display cute header
+#
+bolded=`tput bold`
+normal=`tput sgr0`
+#
+clear
+echo "**********************************************"
+echo -e "${bolded}Assignment #12 -> Timed Executions${normal}"
+echo -e "This may take a few minutes...\n\n"
+#
+# -----------------------------------------------------
+#  Times tests
+#
+echo -e "Starting Timed Executions\\n"
+echo "##############################################" > a12times.txt
+echo -e "Sequential Timed Executions" >> a12times.txt
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (1 thread)" >> a12times.txt
+(time ./$1 -th 1 -lm 21123122) > null.txt 2>> a12times.txt
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (1 thread)" >> a12times.txt
+(time ./$1 -th 1 -lm 21123122) > null.txt 2>> a12times.txt
+echo "Timed Tests (1 thread) completed."
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (2 threads)" >> a12times.txt
+(time ./$1 -th 2 -lm 21123122) > null.txt 2>> a12times.txt
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (2 threads)" >> a12times.txt
+(time ./$1 -th 2 -lm 21123122) > null.txt 2>> a12times.txt
+echo "Timed Tests (2 threads) completed."
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (3 threads)" >> a12times.txt
+(time ./$1 -th 3 -lm 21123122) > null.txt 2>> a12times.txt
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (3 threads)" >> a12times.txt
+(time ./$1 -th 3 -lm 21123122) > null.txt 2>> a12times.txt
+echo "Timed Tests (3 threads) completed."
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (4 threads)" >> a12times.txt
+(time ./$1 -th 4 -lm 21123122) > null.txt 2>> a12times.txt
+#
+echo -e "\\n-------------------" >> a12times.txt
+echo "Timed Test (4 threads)" >> a12times.txt
+(time ./$1 -th 4 -lm 21123122) > null.txt 2>> a12times.txt
+echo "Timed Tests (4 threads) completed."
+#
+echo  >> a12times.txt
+echo  >> a12times.txt
+#
+rm null.txt
+#
+# -----------------------------------------------------
+# Done
+#
+echo
+echo
+echo "Timed Tests completed."
+echo "See ${bolded}a12times.txt${normal} results."
+echo
+
