@@ -224,19 +224,26 @@ WaitForThreadCompletion:
 	mov	rsi, NULL
 	call	pthread_join
 
+	cmp dword[threadCount], 2
+	jb noMoreThreads
 	mov	rdi, qword [pthreadID1]
 	mov	rsi, NULL
 	call	pthread_join
 
+	cmp dword[threadCount], 3
+	jb noMoreThreads
 	mov	rdi, qword [pthreadID2]
 	mov	rsi, NULL
 	call	pthread_join
 
+	cmp dword[threadCount], 4
+	jb noMoreThreads
 	mov	rdi, qword [pthreadID3]
 	mov	rsi, NULL
 	call	pthread_join
 ;	YOUR CODE GOES HERE
 
+	noMoreThreads:
 
 
 ; -----
