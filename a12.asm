@@ -287,15 +287,18 @@ hpNumberCounter:
 ;	YOUR CODE GOES HERE
 
     mov r14, qword[numberLimit] ;eg 500 000
-    mov r15, 0  ; I 
+    mov r15, 2  ; I 
     mov r13, 0  ;sumArr 
     mov r11, 0  ;rhs 
 
     whileLoop:
     ;sum up the divisors 
+	mov r11, 0 				;clear rhs 
     mov r12, 1  ;i 
+	mov r13 , 0 			;init 
+
     divisorsSum:
-    mov rax, r15
+    mov rax, r15 			;copy I for div
     mov rdx, 0 
     div r12     ;I%i
 
