@@ -335,7 +335,7 @@ int2quinary:
 	div r15 
 	mov r11, rax 	;n = n /5 
 	add r14, 48 
-	mov dword[rsi+r13], r14 ;str[i] = rem + 48 
+	mov byte[rsi+r13], r14b ;str[i] = rem + 48 
 	dec r13 
 	cmp r11, 0 
 	jg i2qLoop
@@ -355,7 +355,11 @@ int2quinary:
 ;  Function: Check and convert ASCII/Quinary to integer
 
 ;  Example HLL Call:
-;	stat = quinary2int(qStr, &num);
+;	stat = quinary2int(qStr, &num); - no 
+;	rdi - quinary string 
+;	rsi - return address or use rax 
+;	returns rax - quinary int converted to b10 
+
 
 global	quinary2int
 quinary2int:
@@ -370,27 +374,16 @@ quinary2int:
 	mov r13, 0	;rem  
 	mov r11, 0 ;result 
 	mov r12, rdi 					;the int 
+	mov r10, 18 					;iterator 
 
 	q2iLoop:
-	mov rax, r12 					;copy the og int
-	mov rdx, 0 						;prepare for mul 
-	mov rbx, 10 					
-	div rbx 						;num%10 
-	mov r12, rax 					;num = num/10
-	mov r13, rdx 					;rem = num%10  
-	;result = result +rem * 5^base 
-	mov rax, r13 					;rem 
-	mov rdx, 0 
-	mul r15 		;rem * base 
-	add r11 , rax 	;result += rem*base 
-	;b=b*5 
-	mov rax, r15 
-	mul r14 
-	mov r15, rax 
-	
-	cmp r12, 0 
-	gj q2iLoop
+	mov r13, byte[rdi+r10]
+	cmp r13, 0						;check if null 
+	je q2iLoopDone
 
+	
+	jg q2iLoop
+	
 	mov rax, r11 
 
 	pop r15
@@ -477,22 +470,41 @@ getParams:
 	mov rax, [rsi+8*1] 	;-th  
 	cmp byte[rax ], 45 	;- 
 	jne commandLineOptError
-	cmp byte[rax+1] , 105; t 
+	cmp byte[rax+1] , 116; t 
 	jne commandLineOptError
-	cmp byte[rax+2] , 0; h 
+	cmp byte[rax+2] , 104; h 
+	jne commandLineOptError
+	cmp byte[rax+3] , 0;  
 	jne commandLineOptError
 
 	;check the second identifier 
 	mov rax, [rsi+8*3] 	;-lm  
 	cmp byte[rax ], 45 	;- 
 	jne commandLineOptError
-	cmp byte[rax+1] , 105; l 
+	cmp byte[rax+1] , 108; l 
 	jne commandLineOptError
-	cmp byte[rax+2] , 0; m 
+	cmp byte[rax+2] , 109; m 
+	jne commandLineOptError
+	cmp byte[rax+3] , 0; 
 	jne commandLineOptError
 
-	;convert to quinary 
 
+	;get thread ct 
+	mov rax, [rsi+8*2]
+	mov r15b, byte[rax]
+	sub r15b, 48 
+	mov dword[rdx], r15d 	;return thread count 
+	mov r8, rcx 
+
+	
+	;convert from quinary to int  
+	mov rax, [rsi+8*4]	;quinary number 
+	mov rdi, qword[rsi]
+	call quinary2int
+
+	mov r15, rax 		;store in base 10 
+	mov dword[r8], r15d  ;return limit 
+	jmp funcDone;
 
 
 	commandLineOptError:
@@ -500,6 +512,9 @@ getParams:
     mov dword[rdx], 1 
     mov dword[rcx], 500000
     mov rax, TRUE
+
+	funcDone;
+	mov rax,TRUE
 
 	ret
 

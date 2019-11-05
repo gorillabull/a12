@@ -5,22 +5,26 @@ void i2q(int);
 
 int main(){
     i2q(4788);
-    int num = 123123;
+
+
+    char num[] = {'1','2','3','1','2','3',0};
+
     int b10Num =0;  //number in b10 
     //convert to base 10 
 
     int rem = 0 ;
     int b = 1;
     int pMul = 5; 
+    int iter = 5 ; //ch count -1 for null 
 
-    while(num >0 ){
-        rem = num%10;
-        num = num/10;
-        
+    while(iter >-1 ){
+        rem = num[iter]-48;
+        cout<<rem;
         b10Num += rem * b ; 
         b=b*pMul;               //next power 
+        iter--;
     }
-
+    cout<<endl;
     cout<<b10Num<<endl;
     return 0;
 }
@@ -49,7 +53,7 @@ void i2q(int n){
       iter--;
      }
 
-     
+
      cout<<str<<endl;
         
 }
