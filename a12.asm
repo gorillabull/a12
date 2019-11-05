@@ -163,9 +163,59 @@ main:
 
 ;	YOUR CODE GOES HERE
 
+    mov eax, dword[threadCount]
+    mov ebx,  2
+    cmp eax, ebx 
+    je twoThreads
+    mov ebx,  3
+    cmp eax, ebx 
+    je threeThreads
+    mov ebx,  4
+    cmp eax, ebx 
+    je fourThreads
+    jmp WaitForThreadCompletion
 
+    twoThreads:
+    mov	rdi, pthreadID1
+	mov	rsi, NULL
+	mov	rdx, hpNumberCounter
+	mov	rcx, NULL
+	call	pthread_create
+    jmp WaitForThreadCompletion
 
+    threeThreads:
+    mov	rdi, pthreadID1
+	mov	rsi, NULL
+	mov	rdx, hpNumberCounter
+	mov	rcx, NULL
+	call	pthread_create
 
+    mov	rdi, pthreadID2
+	mov	rsi, NULL
+	mov	rdx, hpNumberCounter
+	mov	rcx, NULL
+	call	pthread_create
+    jmp WaitForThreadCompletion
+
+    fourThreads:
+    mov	rdi, pthreadID1
+	mov	rsi, NULL
+	mov	rdx, hpNumberCounter
+	mov	rcx, NULL
+	call	pthread_create
+
+    mov	rdi, pthreadID2
+	mov	rsi, NULL
+	mov	rdx, hpNumberCounter
+	mov	rcx, NULL
+	call	pthread_create
+
+    mov	rdi, pthreadID3
+	mov	rsi, NULL
+	mov	rdx, hpNumberCounter
+	mov	rcx, NULL
+	call	pthread_create
+    jmp WaitForThreadCompletion
 ;  Wait for thread(s) to complete.
 ;	pthread_join (pthreadID0, NULL);
 
@@ -174,7 +224,17 @@ WaitForThreadCompletion:
 	mov	rsi, NULL
 	call	pthread_join
 
+	mov	rdi, qword [pthreadID1]
+	mov	rsi, NULL
+	call	pthread_join
 
+	mov	rdi, qword [pthreadID2]
+	mov	rsi, NULL
+	call	pthread_join
+
+	mov	rdi, qword [pthreadID3]
+	mov	rsi, NULL
+	call	pthread_join
 ;	YOUR CODE GOES HERE
 
 
@@ -226,8 +286,44 @@ hpNumberCounter:
 
 ;	YOUR CODE GOES HERE
 
+    mov r14, qword[numberLimit] ;eg 500 000
+    mov r15, 0  ; I 
+    mov r13, 0  ;sumArr 
+    mov r11, 0  ;rhs 
 
     whileLoop:
+    ;sum up the divisors 
+    mov r12, 1  ;i 
+    divisorsSum:
+    mov rax, r15
+    mov rdx, 0 
+    div r12     ;I%i
+
+    cmp rdx, 0  ;==0? 
+    jne notDivisor
+    add r13,r12             ;sumArr +=i 
+
+    notDivisor:
+    inc r12 
+    cmp r12, r15
+    jl divisorsSum
+
+    dec r13                 ;sumarr -1 
+    mov rax, r13 
+    mov r13, 2 
+    mul r13                 ;2*  sumarr -1 
+    mov r13, rax 
+    inc r13                 ;1+ 2*(sumarr-1)
+
+    cmp r13, r15 
+    jne notHP
+    mov rax, qword[hpCount]
+    inc rax 
+    mov qword[hpCount], rax 
+    notHP:
+
+
+    ;I++
     call spinLock
     mov r15, qword[idxCounter]
     inc r15  
@@ -235,14 +331,9 @@ hpNumberCounter:
     ;done modifying mem so unlock 
     call spinUnlock
     
-    cmp r15, 500000
-    jl whileLoop
+    cmp r15, r14
+    jle whileLoop
     
-    mov r15, qword[hpCount]
-    inc r15 
-    mov qword[hpCount],r15 
-
-
     
 	ret
 
@@ -510,7 +601,7 @@ getParams:
 	mov r15b, byte[rax]
 	sub r15b, 48 
 	mov dword[rdx], r15d 	;return thread count 
-	mov r8, rcx 
+	push rcx 
 
 	
 	;convert from quinary to int  
@@ -518,8 +609,9 @@ getParams:
 	mov rdi, rax; qword[rax]
 	call quinary2int
 
+    pop rcx 
 	mov r15, rax 		;store in base 10 
-	mov qword[r8], r15  ;return limit 
+	mov qword[rcx], r15  ;return limit 
 	jmp funcDone;
 
 
