@@ -9,6 +9,9 @@ section	.data
 ; -----
 ;  Define standard constants.
 
+
+
+
 LF		equ	10			; line feed
 NULL		equ	0			; end of string
 ESC		equ	27			; escape key
@@ -287,8 +290,8 @@ spinUnlock:
 
 ; -----
 ;  Arguments:
-;	1) integer, value
-;	2) string, address
+;	1) integer, value - rdi 
+;	2) string, address - rsi 
 ; -----
 ;  Returns:
 ;	ASCII/Quinary string (NULL terminated)
@@ -298,6 +301,52 @@ int2quinary:
 
 
 ;	YOUR CODE GOES HERE
+	push r15 
+	push r14 
+	push r13 
+	push r12 
+	push r11 
+	push r10 
+
+	;null terminate 
+	mov byte[rsi+19], 0  
+	;init with spaces 
+	mov rax, 0 
+	i2qInitZeroesLoop:
+	mov byte[rsi+rax], 32 
+	inc rax 
+	cmp rax, 19 
+	jl i2qInitZeroesLoop
+
+	mov r15, 5 		;base divisor 
+	mov r14, 0 		;store remainder here 
+	mov r13 ,18 	;iterator 
+	mov r11, rdi 	;copy integer 
+
+	mov rax, r11  
+	i2qLoop:
+	mov rax, r11 
+	mov rdx , 0 
+	div r15 
+	mov r14, rdx 	
+	sub r11, r14 	;n = n - rem 
+	mov rax, r11 
+	mov rdx, 0 
+	div r15 
+	mov r11, rax 	;n = n /5 
+	add r14, 48 
+	mov dword[rsi+r13], r14 ;str[i] = rem + 48 
+	dec r13 
+	cmp r11, 0 
+	jg i2qLoop
+
+
+	pop r10 
+	pop r11 
+	pop r12 
+	pop r13 
+	pop r14 
+	pop r15 
 
 
 	ret
@@ -310,9 +359,43 @@ int2quinary:
 
 global	quinary2int
 quinary2int:
+	push r13 
+	push r14 
+	push r15 
 
 
 ;	YOUR CODE GOES HERE
+	mov r15, 1 ;base 
+	mov r14, 5 ;power mul 
+	mov r13, 0	;rem  
+	mov r11, 0 ;result 
+	mov r12, rdi 					;the int 
+
+	q2iLoop:
+	mov rax, r12 					;copy the og int
+	mov rdx, 0 						;prepare for mul 
+	mov rbx, 10 					
+	div rbx 						;num%10 
+	mov r12, rax 					;num = num/10
+	mov r13, rdx 					;rem = num%10  
+	;result = result +rem * 5^base 
+	mov rax, r13 					;rem 
+	mov rdx, 0 
+	mul r15 		;rem * base 
+	add r11 , rax 	;result += rem*base 
+	;b=b*5 
+	mov rax, r15 
+	mul r14 
+	mov r15, rax 
+	
+	cmp r12, 0 
+	gj q2iLoop
+
+	mov rax, r11 
+
+	pop r15
+	pop r14 
+	pop r13 
 
 
 	ret
@@ -374,20 +457,46 @@ printStringDone:
 ;  For good data, all values are returned via addresses with TRUE returned.
 
 ;  Command line format (fixed order):
-;	-th <1|2|3|4> -lm <quinaryNumber>
-
+;./main	-th <1|2|3|4> -lm <quinaryNumber>
+; 0       1     2  	    3    4 
 ; -----
 ;  Arguments:
-;	1) ARGC, value
-;	2) ARGV, address
-;	3) thread count (dword), address
-;	4) prime limit (qword), address
+;	1) ARGC, value	- rdi 
+;	2) ARGV, address - rsi 
+;	3) thread count (dword), address - rdx 
+;	4) prime limit (qword), address - rcx 
+
 
 global getParams
 getParams:
 
 
 ;	YOUR CODE GOES HERE
+		
+	;cmp first identifier to see if its valid 
+	mov rax, [rsi+8*1] 	;-th  
+	cmp byte[rax ], 45 	;- 
+	jne commandLineOptError
+	cmp byte[rax+1] , 105; t 
+	jne commandLineOptError
+	cmp byte[rax+2] , 0; h 
+	jne commandLineOptError
+
+	;check the second identifier 
+	mov rax, [rsi+8*3] 	;-lm  
+	cmp byte[rax ], 45 	;- 
+	jne commandLineOptError
+	cmp byte[rax+1] , 105; l 
+	jne commandLineOptError
+	cmp byte[rax+2] , 0; m 
+	jne commandLineOptError
+
+	;convert to quinary 
+
+
+
+	commandLineOptError:
+
     mov dword[rdx], 1 
     mov dword[rcx], 500000
     mov rax, TRUE
