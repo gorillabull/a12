@@ -15,15 +15,25 @@ int main(){
     int rem = 0 ;
     int b = 1;
     int pMul = 5; 
-    int iter = 5 ; //ch count -1 for null 
+    int iter = 0 ; //ch count -1 for null 
+    //find # of digits 
+    while (num[iter]!=0)
+    {
+        iter++;
+    }
+    iter--; 
 
     while(iter >-1 ){
+
         rem = num[iter]-48;
-        cout<<rem;
         b10Num += rem * b ; 
         b=b*pMul;               //next power 
+
+        
         iter--;
     }
+
+
     cout<<endl;
     cout<<b10Num<<endl;
     return 0;

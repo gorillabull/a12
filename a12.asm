@@ -369,20 +369,36 @@ quinary2int:
 
 
 ;	YOUR CODE GOES HERE
-	mov r15, 1 ;base 
+	mov r15, 1 ;base  b
 	mov r14, 5 ;power mul 
 	mov r13, 0	;rem  
 	mov r11, 0 ;result 
 	mov r12, rdi 					;the int 
-	mov r10, 18 					;iterator 
+	mov r10, 0 					;iterator 
+
+    ;find # of digits 
+    findNumOfDigits:
+    mov al, byte[rdi+r10]
+    inc r10
+    cmp al, 0
+    jne findNumOfDigits
+
+    dec r10                     ;iter-- 
+    dec r10
 
 	q2iLoop:
-	mov r13, byte[rdi+r10]
-	cmp r13, 0						;check if null 
-	je q2iLoopDone
+    mov r13b, byte[rdi+r10] ;arr[iter] - 48
+    sub r13b, 48 
+    mov rax, r13 
+    mul r15                 ;rem * b 
+    add r11, rax            ;result +=rem * b 
+    mov rax, r15            ;b 
+    mul r14                 ;b*5 
+    mov r15, rax            ;b=b*b
 
-	
-	jg q2iLoop
+    dec r10 
+	cmp r10, 0
+	jge q2iLoop
 	
 	mov rax, r11 
 
@@ -499,11 +515,11 @@ getParams:
 	
 	;convert from quinary to int  
 	mov rax, [rsi+8*4]	;quinary number 
-	mov rdi, qword[rsi]
+	mov rdi, rax; qword[rax]
 	call quinary2int
 
 	mov r15, rax 		;store in base 10 
-	mov dword[r8], r15d  ;return limit 
+	mov qword[r8], r15  ;return limit 
 	jmp funcDone;
 
 
