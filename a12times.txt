@@ -1,0 +1,60 @@
+##############################################
+Sequential Timed Executions
+
+-------------------
+Timed Test (1 thread)
+
+real	3m44.286s
+user	3m43.678s
+sys	0m0.308s
+
+-------------------
+Timed Test (1 thread)
+
+real	3m44.650s
+user	3m43.741s
+sys	0m0.276s
+
+-------------------
+Timed Test (2 threads)
+
+real	2m26.566s
+user	3m43.709s
+sys	0m0.809s
+
+-------------------
+Timed Test (2 threads)
+
+real	2m21.242s
+user	3m43.593s
+sys	0m0.793s
+
+-------------------
+Timed Test (3 threads)
+
+real	2m3.165s
+user	3m43.730s
+sys	0m0.433s
+
+-------------------
+Timed Test (3 threads)
+
+real	2m7.617s
+user	3m43.822s
+sys	0m0.422s
+
+-------------------
+Timed Test (4 threads)
+
+real	2m4.968s
+user	3m43.975s
+sys	0m0.431s
+
+-------------------
+Timed Test (4 threads)
+
+real	1m55.323s
+user	3m43.789s
+sys	0m0.131s
+
+
