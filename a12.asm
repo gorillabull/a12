@@ -582,34 +582,41 @@ getParams:
 
 
 ;	YOUR CODE GOES HERE
-		
+	cmp rdi, 5 
+    jl displayError 
+
 	;cmp first identifier to see if its valid 
 	mov rax, [rsi+8*1] 	;-th  
 	cmp byte[rax ], 45 	;- 
-	jne commandLineOptError
+	jne errThreadCtSpec
 	cmp byte[rax+1] , 116; t 
-	jne commandLineOptError
+	jne errThreadCtSpec
 	cmp byte[rax+2] , 104; h 
-	jne commandLineOptError
+	jne errThreadCtSpec
 	cmp byte[rax+3] , 0;  
-	jne commandLineOptError
+	jne errThreadCtSpec
+
+
 
 	;check the second identifier 
 	mov rax, [rsi+8*3] 	;-lm  
 	cmp byte[rax ], 45 	;- 
-	jne commandLineOptError
+	jne errLimitSpec
 	cmp byte[rax+1] , 108; l 
-	jne commandLineOptError
+	jne errLimitSpec
 	cmp byte[rax+2] , 109; m 
-	jne commandLineOptError
+	jne errLimitSpec
 	cmp byte[rax+3] , 0; 
-	jne commandLineOptError
+	jne errLimitSpec
 
 
 	;get thread ct 
 	mov rax, [rsi+8*2]
 	mov r15b, byte[rax]
 	sub r15b, 48 
+    mov rax, 4 ;error check
+    cmp r15b, 4 
+    jg errThreadValue
 	mov dword[rdx], r15d 	;return thread count 
 	push rcx 
 
@@ -622,18 +629,48 @@ getParams:
     pop rcx 
 	mov r15, rax 		;store in base 10 
 	mov qword[rcx], r15  ;return limit 
-	jmp funcDone;
+	jmp funcSuccess;
 
+    displayError:
+    mov rdi, errUsage
+    call printString
+    jmp funcDone
 
 	commandLineOptError:
+    mov rdi, errOptions
+    call printString
+    jmp funcDone
 
-    mov dword[rdx], 1 
-    mov dword[rcx], 500000
-    mov rax, TRUE
+    errThreadCtSpec:
+    mov rdi, errTHspec
+    call printString
+    jmp funcDone
+
+    errThreadValue:
+    mov rdi, errTHvalue
+    call printString
+    jmp funcDone
+
+    errLimitSpec:
+    mov rdi, errLSpec
+    call printString
+    jmp funcDone
+
+    errLimValue:
+    mov rdi, errLValue
+    call printString
+    jmp funcDone
+
+    
+
+    funcSuccess:
+    mov rax,TRUE
+    jmp return
 
 	funcDone;
-	mov rax,TRUE
+	mov rax,FALSE
 
+    return:
 	ret
 
 ; ******************************************************************
