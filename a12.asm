@@ -1,6 +1,8 @@
 ;  CS 218
 ;  k-hyperperfect numbers
 ;  Threading program, provided template
+;   Leonardo Vasilev
+;   Section 1003
 
 ; ***************************************************************
 
